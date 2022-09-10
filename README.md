@@ -33,8 +33,6 @@ proxy:
       - PUT
     pass:
       /dynconf/{version}/global
-    setHeaders:
-      - X-Auth-Token
 
   /services/:
     methods:
@@ -42,8 +40,6 @@ proxy:
       - PUT
     pass:
       /dynconf/{version}/services
-    setHeaders:
-      - X-Auth-Token
 
   /nodes/:
     methods:
@@ -51,6 +47,4 @@ proxy:
       - PUT
     pass:
       /dynconf/{version}/nodes
-    setHeaders:
-      - X-Auth-Token
 ```

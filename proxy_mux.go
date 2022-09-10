@@ -24,9 +24,8 @@ func (s *server) reset() {
 }
 
 type proxy struct {
-	Methods    []string `yaml:"methods,flow"`
-	Pass       string   `yaml:"pass"`
-	SetHeaders []string `yaml:"setHeaders,flow"`
+	Methods []string `yaml:"methods,flow"`
+	Pass    string   `yaml:"pass"`
 }
 
 type muxEntry struct {
