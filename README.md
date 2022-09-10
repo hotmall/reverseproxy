@@ -48,3 +48,17 @@ proxy:
     pass:
       /dynconf/{version}/nodes
 ```
+
+Note:
+
+```yaml
+proxy:
+  /global/:
+    methods:
+      - GET
+      - PUT
+    pass:
+      /dynconf/{version}/global
+```
+
+`/global/` means url pattern, must begin with `/`, and end with `/` means prefix match, no `/` suffix means exact match.

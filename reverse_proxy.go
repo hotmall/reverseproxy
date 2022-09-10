@@ -1,7 +1,6 @@
 package reverseproxy
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -13,7 +12,7 @@ import (
 func newSingleHostReverseProxy(target string) *httputil.ReverseProxy {
 	u, err := url.Parse(target)
 	if err != nil {
-		fmt.Println("url parse fail")
+		// fmt.Println("url parse fail")
 		return nil
 	}
 
