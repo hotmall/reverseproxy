@@ -11,12 +11,13 @@ go get github.com/hotmall/reverseproxy
 ```go
 import "github.com/emicklei/go-restful"
 
-ws, err := reverseproxy.NewWebService("./etc/proxy")
+wss, err := reverseproxy.NewWebService("./etc/proxy")
 if err != nil {
     panic("new revese proxy webservice fail")
 }
-restful.Add(ws)
-
+for _, ws := range wss {
+  restful.Add(ws)
+}
 ```
 
 YAML file configuration
@@ -24,7 +25,7 @@ YAML file configuration
 ```yaml
 title: Reverse Proxy Configuration
 version: v1
-baseUri: /ops/{version}
+baseUri: /ops/{version}/dynconf
 target: http://127.0.0.1:8000
 proxy:
   /global/:

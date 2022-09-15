@@ -7,32 +7,35 @@ import (
 	"github.com/emicklei/go-restful"
 )
 
-func NewWebService(dir string) (ws *restful.WebService, err error) {
+func NewWebService(dir string) (wss []*restful.WebService, err error) {
 	files, err := walkYaml(dir)
 	if err != nil {
 		return
 	}
 
-	ws = new(restful.WebService)
 	var s server
 	for _, f := range files {
 		if err = parseYaml(f, &s); err != nil {
 			return
 		}
 
+		ws := new(restful.WebService)
+		ws.Path(s.BaseUri)
+
 		handler := newSingleHostReverseProxy(s.Target)
-		for pattern, proxy := range s.Proxy {
-			// fmt.Printf("pattern: %s\n", pattern)
-			pattern := concatPath(s.BaseUri, pattern)
+		for subPath, proxy := range s.Proxy {
+			pattern := concatPath(s.BaseUri, subPath)
 			defaultProxyMux.handle(pattern, proxy, handler)
+
+			if strings.HasSuffix(subPath, "/") {
+				subPath += "{subpath:*}"
+			}
 			for _, method := range proxy.Methods {
-				if strings.HasSuffix(pattern, "/") {
-					pattern += "{subpath:*}"
-				}
-				rb := newRouteBuilder(ws, method, pattern)
+				rb := newRouteBuilder(ws, method, subPath)
 				ws.Route(rb.To(onMessage))
 			}
 		}
+		wss = append(wss, ws)
 		s.reset()
 	}
 	return
