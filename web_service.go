@@ -27,6 +27,14 @@ func NewWebService(dir string) (wss []*restful.WebService, err error) {
 			pattern := concatPath(s.BaseUri, subPath)
 			defaultProxyMux.handle(pattern, proxy, handler)
 
+			// 如果 subPath == “/”，再配置一次做精确匹配
+			if subPath == "/" {
+				for _, method := range proxy.Methods {
+					rb := newRouteBuilder(ws, method, subPath)
+					ws.Route(rb.To(onMessage))
+				}
+			}
+
 			if strings.HasSuffix(subPath, "/") {
 				subPath += "{subpath:*}"
 			}
