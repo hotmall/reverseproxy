@@ -24,16 +24,18 @@ func NewWebService(dir string) (wss []*restful.WebService, err error) {
 
 		handler := newSingleHostReverseProxy(s.Target)
 		for subPath, proxy := range s.Proxy {
-			pattern := concatPath(s.BaseUri, subPath)
-			defaultProxyMux.handle(pattern, proxy, handler)
-
 			// 如果 subPath == “/”，再配置一次做精确匹配
 			if subPath == "/" {
+				pattern := strings.TrimRight(s.BaseUri, "/")
+				defaultProxyMux.handle(pattern, proxy, handler)
 				for _, method := range proxy.Methods {
 					rb := newRouteBuilder(ws, method, subPath)
 					ws.Route(rb.To(onMessage))
 				}
 			}
+
+			pattern := concatPath(s.BaseUri, subPath)
+			defaultProxyMux.handle(pattern, proxy, handler)
 
 			if strings.HasSuffix(subPath, "/") {
 				subPath += "{subpath:*}"
