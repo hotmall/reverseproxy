@@ -62,4 +62,16 @@ proxy:
       /dynconf/{version}/global
 ```
 
-`/global/` means url pattern, must begin with `/`, and end with `/` means prefix match, no `/` suffix means exact match.
+Subpath `/global/` means url pattern, must begin with `/`, and end with `/` means prefix match, no `/` suffix means exact match.
+
+```yaml
+proxy:
+  /:
+    methods:
+      - GET
+      - PUT
+    pass:
+      /pay/v1/banks
+```
+
+Subpath `/` means prefix match and exact match.
