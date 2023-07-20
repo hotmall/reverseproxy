@@ -59,40 +59,75 @@ func onMessage(req *restful.Request, resp *restful.Response) {
 
 	fmt.Printf("req.pathParameters = %v\n", req.PathParameters())
 	fmt.Printf("req.selectedRoutePath = %v\n", req.SelectedRoutePath())
-	subPath := req.PathParameter("subpath")
-	fmt.Printf("subpath: %s\n", subPath)
+	// subPath := req.PathParameter("subpath")
+	// fmt.Printf("subpath: %s\n", subPath)
+	// routePath =
 	pattern, proxy, handler := defaultProxyMux.match(req.SelectedRoutePath())
 	if len(pattern) == 0 {
-		result := make(map[string]string)
-		result["message"] = "not found"
-		result["code"] = "500"
-		resp.WriteHeaderAndEntity(404, result)
+		e := acquireError()
+		defer releaseError(e)
+		e.Code = 404
+		e.Message = "proxy: not found route"
+		resp.WriteHeaderAndEntity(404, e)
 		return
 	}
 	fmt.Println("proxy mux match", pattern, proxy.Pass)
 
-	a, err := url.Parse(proxy.Pass)
-	if err != nil {
-		result := make(map[string]string)
-		result["message"] = err.Error()
-		result["code"] = "404"
-		resp.WriteHeaderAndEntity(500, result)
-		return
+	// 判断是否存在路径参数，存在路径参数，构建 pass
+	params := req.PathParameters()
+	if v, ok := params["subpath"]; ok {
+		subPath := v
+		a, err := url.Parse(proxy.Pass)
+		if err != nil {
+			e := acquireError()
+			defer releaseError(e)
+			e.Code = 500
+			e.Message = err.Error()
+			resp.WriteHeaderAndEntity(500, e)
+			return
+		}
+		b, err := url.Parse(subPath)
+		if err != nil {
+			e := acquireError()
+			defer releaseError(e)
+			e.Code = 500
+			e.Message = err.Error()
+			resp.WriteHeaderAndEntity(500, e)
+			return
+		}
+		req.Request.URL.Path, req.Request.URL.RawPath = joinURLPath(a, b)
+	} else {
+		// 判断 proxy_pass 是否含有路径参数
+		pos := strings.Index(proxy.Pass, "{")
+		if pos != -1 {
+			// 含有路径参数替换之
+			tokens := tokenizePath(proxy.Pass)
+			for ind, each := range tokens {
+				if strings.HasPrefix(each, "{") {
+					varName := strings.TrimSpace(each[1 : len(each)-1])
+					if v, ok := params[varName]; ok {
+						tokens[ind] = v
+					}
+				}
+			}
+			req.Request.URL.Path = strings.Join(tokens, "/")
+		} else {
+			req.Request.URL.Path = proxy.Pass
+		}
 	}
-	b, err := url.Parse(subPath)
-	if err != nil {
-		result := make(map[string]string)
-		result["message"] = err.Error()
-		result["code"] = "500"
-		resp.WriteHeaderAndEntity(500, result)
-		return
-	}
-	req.Request.URL.Path, req.Request.URL.RawPath = joinURLPath(a, b)
+
 	handler.ServeHTTP(resp.ResponseWriter, req.Request)
 }
 
 func concatPath(path1, path2 string) string {
 	return strings.TrimRight(path1, "/") + "/" + strings.TrimLeft(path2, "/")
+}
+
+func tokenizePath(path string) []string {
+	if path == "/" {
+		return nil
+	}
+	return strings.Split(strings.Trim(path, "/"), "/")
 }
 
 func newRouteBuilder(ws *restful.WebService, method, subPath string) *restful.RouteBuilder {
