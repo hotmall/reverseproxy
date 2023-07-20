@@ -21,7 +21,7 @@ func NewWebService(dir string) (wss []*restful.WebService, err error) {
 		}
 
 		ws := new(restful.WebService)
-		ws.Path(s.BaseUri)
+		ws.Path(s.BaseUri).Consumes("application/json").Produces("application/json")
 
 		handler := newSingleHostReverseProxy(s.Target)
 		for subPath, proxy := range s.Proxy {
