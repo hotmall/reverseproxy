@@ -116,6 +116,8 @@ func onMessage(req *restful.Request, resp *restful.Response) {
 		}
 	}
 
+	fmt.Printf("req.Request.URL.Path222 = %v\n", req.Request.URL.Path)
+
 	handler.ServeHTTP(resp.ResponseWriter, req.Request)
 }
 
