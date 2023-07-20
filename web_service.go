@@ -62,6 +62,12 @@ func onMessage(req *restful.Request, resp *restful.Response) {
 	subPath := req.PathParameter("subpath")
 	fmt.Printf("subpath: %s\n", subPath)
 	pattern, proxy, handler := defaultProxyMux.match(req.Request.URL.Path)
+	if len(pattern) == 0 {
+		result := make(map[string]string)
+		result["message"] = "not found"
+		result["code"] = "500"
+		resp.WriteHeaderAndEntity(404, result)
+	}
 	fmt.Println("proxy mux match", pattern, proxy.Pass)
 
 	a, err := url.Parse(proxy.Pass)
