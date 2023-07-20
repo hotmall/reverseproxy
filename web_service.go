@@ -61,7 +61,7 @@ func onMessage(req *restful.Request, resp *restful.Response) {
 	fmt.Printf("req.selectedRoutePath = %v\n", req.SelectedRoutePath())
 	subPath := req.PathParameter("subpath")
 	fmt.Printf("subpath: %s\n", subPath)
-	pattern, proxy, handler := defaultProxyMux.match(req.Request.URL.Path)
+	pattern, proxy, handler := defaultProxyMux.match(req.SelectedRoutePath())
 	if len(pattern) == 0 {
 		result := make(map[string]string)
 		result["message"] = "not found"
@@ -75,7 +75,7 @@ func onMessage(req *restful.Request, resp *restful.Response) {
 	if err != nil {
 		result := make(map[string]string)
 		result["message"] = err.Error()
-		result["code"] = "500"
+		result["code"] = "404"
 		resp.WriteHeaderAndEntity(500, result)
 		return
 	}
