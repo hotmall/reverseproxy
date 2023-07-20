@@ -53,10 +53,12 @@ func NewWebService(dir string) (wss []*restful.WebService, err error) {
 }
 
 func onMessage(req *restful.Request, resp *restful.Response) {
-	fmt.Printf("req.pathParameters = %v", req.PathParameters())
-	fmt.Printf("req.selectedRoutePath = %v", req.SelectedRoutePath())
-	fmt.Println("on message", "xx", req.Request.URL.Path, req.Request.URL.RawPath, req.Request.URL.RawQuery)
-	fmt.Println("routePath", req.SelectedRoutePath())
+	fmt.Printf("req.Request.URL.Path = %v\n", req.Request.URL.Path)
+	fmt.Printf("req.Request.URL.RawPath = %v\n", req.Request.URL.RawPath)
+	fmt.Printf("req.Request.URL.RawQuery = %v\n", req.Request.URL.RawQuery)
+
+	fmt.Printf("req.pathParameters = %v\n", req.PathParameters())
+	fmt.Printf("req.selectedRoutePath = %v\n", req.SelectedRoutePath())
 	subPath := req.PathParameter("subpath")
 	fmt.Printf("subpath: %s\n", subPath)
 	pattern, proxy, handler := defaultProxyMux.match(req.Request.URL.Path)
