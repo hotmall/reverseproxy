@@ -59,16 +59,25 @@ func onMessage(req *restful.Request, resp *restful.Response) {
 
 	fmt.Printf("req.pathParameters = %v\n", req.PathParameters())
 	fmt.Printf("req.selectedRoutePath = %v\n", req.SelectedRoutePath())
-	// subPath := req.PathParameter("subpath")
-	// fmt.Printf("subpath: %s\n", subPath)
-	// routePath =
+
+	myerr := Error{
+		Code:    200,
+		Message: "ok",
+	}
+	defer func() {
+		if myerr.Code != 200 {
+			e := acquireError()
+			defer releaseError(e)
+			e.Code = myerr.Code
+			e.Message = myerr.Message
+			resp.WriteHeaderAndEntity(e.Code, e)
+		}
+	}()
+
 	pattern, proxy, handler := defaultProxyMux.match(req.SelectedRoutePath())
 	if len(pattern) == 0 {
-		e := acquireError()
-		defer releaseError(e)
-		e.Code = 404
-		e.Message = "proxy: not found route"
-		resp.WriteHeaderAndEntity(404, e)
+		myerr.Code = 404
+		myerr.Message = "proxy: not found route"
 		return
 	}
 	fmt.Println("proxy mux match", pattern, proxy.Pass)
@@ -79,20 +88,14 @@ func onMessage(req *restful.Request, resp *restful.Response) {
 		subPath := v
 		a, err := url.Parse(proxy.Pass)
 		if err != nil {
-			e := acquireError()
-			defer releaseError(e)
-			e.Code = 500
-			e.Message = err.Error()
-			resp.WriteHeaderAndEntity(500, e)
+			myerr.Code = 500
+			myerr.Message = err.Error()
 			return
 		}
 		b, err := url.Parse(subPath)
 		if err != nil {
-			e := acquireError()
-			defer releaseError(e)
-			e.Code = 500
-			e.Message = err.Error()
-			resp.WriteHeaderAndEntity(500, e)
+			myerr.Code = 500
+			myerr.Message = err.Error()
 			return
 		}
 		req.Request.URL.Path, req.Request.URL.RawPath = joinURLPath(a, b)
