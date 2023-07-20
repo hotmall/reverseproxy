@@ -110,7 +110,7 @@ func onMessage(req *restful.Request, resp *restful.Response) {
 					}
 				}
 			}
-			req.Request.URL.Path = strings.Join(tokens, "/")
+			req.Request.URL.Path = "/" + strings.Join(tokens, "/")
 		} else {
 			req.Request.URL.Path = proxy.Pass
 		}
