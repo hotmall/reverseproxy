@@ -1,6 +1,7 @@
 package reverseproxy
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 
@@ -52,12 +53,14 @@ func NewWebService(dir string) (wss []*restful.WebService, err error) {
 }
 
 func onMessage(req *restful.Request, resp *restful.Response) {
-	// fmt.Println("on message", "xx", req.Request.URL.Path, req.Request.URL.RawPath, req.Request.URL.RawQuery)
-	// fmt.Println("routePath", req.SelectedRoutePath())
+	fmt.Printf("req.pathParameters = %v", req.PathParameters())
+	fmt.Printf("req.selectedRoutePath = %v", req.SelectedRoutePath())
+	fmt.Println("on message", "xx", req.Request.URL.Path, req.Request.URL.RawPath, req.Request.URL.RawQuery)
+	fmt.Println("routePath", req.SelectedRoutePath())
 	subPath := req.PathParameter("subpath")
-	// fmt.Printf("subpath: %s\n", subPath)
-	_, proxy, handler := defaultProxyMux.match(req.Request.URL.Path)
-	// fmt.Println("proxy mux match", pattern, proxy.Pass)
+	fmt.Printf("subpath: %s\n", subPath)
+	pattern, proxy, handler := defaultProxyMux.match(req.Request.URL.Path)
+	fmt.Println("proxy mux match", pattern, proxy.Pass)
 
 	a, err := url.Parse(proxy.Pass)
 	if err != nil {
