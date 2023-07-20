@@ -67,6 +67,7 @@ func onMessage(req *restful.Request, resp *restful.Response) {
 		result["message"] = "not found"
 		result["code"] = "500"
 		resp.WriteHeaderAndEntity(404, result)
+		return
 	}
 	fmt.Println("proxy mux match", pattern, proxy.Pass)
 
