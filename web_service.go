@@ -53,12 +53,12 @@ func NewWebService(dir string) (wss []*restful.WebService, err error) {
 }
 
 func onMessage(req *restful.Request, resp *restful.Response) {
-	fmt.Printf("req.Request.URL.Path = %v\n", req.Request.URL.Path)
-	fmt.Printf("req.Request.URL.RawPath = %v\n", req.Request.URL.RawPath)
-	fmt.Printf("req.Request.URL.RawQuery = %v\n", req.Request.URL.RawQuery)
+	// fmt.Printf("req.Request.URL.Path = %v\n", req.Request.URL.Path)
+	// fmt.Printf("req.Request.URL.RawPath = %v\n", req.Request.URL.RawPath)
+	// fmt.Printf("req.Request.URL.RawQuery = %v\n", req.Request.URL.RawQuery)
 
-	fmt.Printf("req.pathParameters = %v\n", req.PathParameters())
-	fmt.Printf("req.selectedRoutePath = %v\n", req.SelectedRoutePath())
+	// fmt.Printf("req.pathParameters = %v\n", req.PathParameters())
+	// fmt.Printf("req.selectedRoutePath = %v\n", req.SelectedRoutePath())
 
 	myerr := Error{
 		Code:    200,
@@ -118,9 +118,7 @@ func onMessage(req *restful.Request, resp *restful.Response) {
 			req.Request.URL.Path = proxy.Pass
 		}
 	}
-
-	fmt.Printf("req.Request.URL.Path222 = %v\n", req.Request.URL.Path)
-
+	// fmt.Printf("req.Request.URL.Path222 = %v\n", req.Request.URL.Path)
 	handler.ServeHTTP(resp.ResponseWriter, req.Request)
 }
 
