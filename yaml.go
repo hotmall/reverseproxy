@@ -2,7 +2,6 @@ package reverseproxy
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -11,7 +10,7 @@ import (
 )
 
 func parseYaml(yamlFile string, s *server) (err error) {
-	data, err := ioutil.ReadFile(yamlFile)
+	data, err := os.ReadFile(yamlFile)
 	if err != nil {
 		// fmt.Printf("reader proxy file fail, err = %s\n", err.Error())
 		return

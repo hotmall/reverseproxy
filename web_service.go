@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/emicklei/go-restful"
+	restful "github.com/emicklei/go-restful/v3"
 )
 
 func NewWebService(dir string) (wss []*restful.WebService, err error) {
